@@ -1,0 +1,30 @@
+# pyproject.toml
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Technicmovehub"
+version = "0.1.1"
+authors = [
+  { name="moob453", email="LachlanBecker@moob453.com" },
+]
+description = "A Python library for controlling the LEGO Technic Move Hub via Bluetooth Low Energy (BLE)."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Home Automation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "bleak>=0.20.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/moob453/legomovehub"
+"Bug Tracker" = "https://github.com/moob453/legomovehub/issues"
