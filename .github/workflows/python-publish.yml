@@ -1,0 +1,65 @@
+# This workflow automates the process of building and publishing a Python package to PyPI.
+# It is designed to be triggered when a new release is published on GitHub.
+
+name: Publish Python Package to PyPI
+
+on:
+  release:
+    types: [published] # This workflow runs when a new GitHub Release is published.
+
+permissions:
+  contents: read # Allows the workflow to read repository content.
+  id-token: write # Required for trusted publishing to PyPI.
+
+jobs:
+  build:
+    name: Build Distribution
+    runs-on: ubuntu-latest # Specifies the operating system for the job.
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Checks out your repository code.
+
+    - name: Set up Python
+      uses: actions/setup-python@v5 # Sets up a Python environment.
+      with:
+        python-version: '3.x' # Use the latest Python 3 version available.
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip # Upgrades pip.
+        pip install build twine bleak # Installs 'build' to create distributions and 'twine' to upload them.
+
+    - name: Build sdist and wheel
+      run: python -m build # Builds the source distribution (sdist) and a wheel.
+
+    - name: Store distribution artifacts
+      uses: actions/upload-artifact@v4 # Uploads the built package files as artifacts.
+      with:
+        name: python-package-distributions
+        path: dist/ # The directory where 'build' places the distribution files.
+
+  publish:
+    name: Publish to PyPI
+    needs: build # This job depends on the 'build' job completing successfully.
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi # Specifies the environment for PyPI publishing.
+      url: https://pypi.org/project/Technicmovehub/ # Replace with your actual PyPI project URL.
+
+    steps:
+    - name: Download distribution artifacts
+      uses: actions/download-artifact@v4 # Downloads the artifacts from the 'build' job.
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1 # Uses the official PyPA action for publishing.
+      with:
+        # This uses OIDC (OpenID Connect) for secure, password-less authentication with PyPI.
+        # You need to configure PyPI to accept OIDC from your GitHub repository.
+        # See: https://docs.pypi.org/trusted-publishers/
+        # No PYPI_API_TOKEN secret is explicitly passed here when using OIDC.
+        # If you are not using OIDC, you would typically have:
+        # password: ${{ secrets.PYPI_API_TOKEN }}
